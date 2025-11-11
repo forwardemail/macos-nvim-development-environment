@@ -134,6 +134,7 @@ These keybindings are available when an LSP server is attached to the buffer:
 | `<leader>rn` | Normal | Rename | Rename symbol |
 | `<leader>ca` | Normal | Code action | Show code actions |
 | `<leader>D` | Normal | Type definition | Go to type definition |
+| `<leader>d` | Normal | Show diagnostic | Show full diagnostic message in float |
 | `[d` | Normal | Previous diagnostic | Go to previous diagnostic |
 | `]d` | Normal | Next diagnostic | Go to next diagnostic |
 | `<leader>dl` | Normal | Diagnostic list | Show diagnostics in location list |

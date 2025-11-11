@@ -3,6 +3,11 @@
   
   Uses native Neovim 0.11+ vim.lsp.config API
   No longer requires nvim-lspconfig plugin
+  
+  NOTE: For XO and Prettier projects:
+  - ESLint LSP is enabled below and will work with XO (XO uses ESLint under the hood)
+  - Prettier formatting is handled by conform.nvim (see lua/plugins/conform.lua)
+  - TypeScript LSP is DISABLED by default (ts_ls is commented out)
 ]]
 
 return {
@@ -15,8 +20,8 @@ return {
       ensure_installed = {
         -- LSP servers
         'lua-language-server',
-        'typescript-language-server',
-        'eslint-lsp',
+        -- 'typescript-language-server', -- DISABLED: Not needed for JavaScript-only projects
+        'eslint-lsp', -- Works with XO (XO uses ESLint)
         'pyright',
         'bash-language-server',
         'json-lsp',
@@ -25,9 +30,9 @@ return {
         'css-lsp',
         -- Formatters
         'stylua',
-        'prettier',
+        'prettier', -- Used by conform.nvim for formatting
         -- Linters
-        'eslint_d',
+        'eslint_d', -- Works with XO
         'shellcheck',
       },
       ui = {
@@ -93,20 +98,31 @@ return {
             vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
           end
 
+          -- Navigation
           map('n', 'gD', vim.lsp.buf.declaration, 'Go to declaration')
           map('n', 'gd', vim.lsp.buf.definition, 'Go to definition')
           map('n', 'K', vim.lsp.buf.hover, 'Hover documentation')
           map('n', 'gi', vim.lsp.buf.implementation, 'Go to implementation')
           map('n', '<C-k>', vim.lsp.buf.signature_help, 'Signature help')
+          map('n', 'gr', vim.lsp.buf.references, 'References')
+          
+          -- Workspace
           map('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, 'Add workspace folder')
           map('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, 'Remove workspace folder')
           map('n', '<leader>wl', function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
           end, 'List workspace folders')
+          
+          -- Code actions
           map('n', '<leader>D', vim.lsp.buf.type_definition, 'Type definition')
           map('n', '<leader>rn', vim.lsp.buf.rename, 'Rename')
           map({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, 'Code action')
-          map('n', 'gr', vim.lsp.buf.references, 'References')
+          
+          -- Diagnostics
+          map('n', '<leader>d', vim.diagnostic.open_float, 'Show diagnostic')
+          map('n', '[d', vim.diagnostic.goto_prev, 'Previous diagnostic')
+          map('n', ']d', vim.diagnostic.goto_next, 'Next diagnostic')
+          map('n', '<leader>dl', vim.diagnostic.setloclist, 'Diagnostic list')
         end,
       })
 
@@ -137,8 +153,9 @@ return {
             },
           },
         },
-        { 'ts_ls' },
-        { 'eslint' },
+        -- TypeScript LSP is DISABLED - uncomment the line below to enable it
+        -- { 'ts_ls' },
+        { 'eslint' }, -- Works with XO (XO uses ESLint under the hood)
         { 'pyright' },
         { 'bashls' },
         { 'jsonls' },

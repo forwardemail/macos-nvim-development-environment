@@ -262,6 +262,7 @@ This project includes comprehensive documentation. Here are the key files:
 - **[README.md](README.md)**: You are here. Overview of the project.
 - **[INSTALL.md](INSTALL.md)**: Detailed installation instructions.
 - **[KEYBINDINGS.md](KEYBINDINGS.md)**: Complete keybinding reference.
+- **[LSP_DIAGNOSTICS.md](LSP_DIAGNOSTICS.md)**: Guide to understanding and managing LSP diagnostics, hints, and code actions.
 - **[PLUGINS.md](PLUGINS.md)**: In-depth documentation for all plugins.
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)**: Solutions to common problems.
 - **[NERD_FONTS.md](NERD_FONTS.md)**: Guide to installing and configuring Nerd Fonts for icons.
