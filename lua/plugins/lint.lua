@@ -18,32 +18,54 @@ return {
     -- HELPER: Find local executable in node_modules or use npx/global
     -- ========================================================================
 
+    -- Find project root by walking up to find package.json
+    local function find_project_root(filepath)
+      if not filepath or filepath == '' then
+        return nil
+      end
+
+      local dir = vim.fn.fnamemodify(filepath, ':p:h')
+      local max_depth = 20
+
+      for _ = 1, max_depth do
+        local package_json = dir .. '/package.json'
+        if vim.fn.filereadable(package_json) == 1 then
+          return dir
+        end
+
+        local parent = vim.fn.fnamemodify(dir, ':h')
+        if parent == dir then
+          break
+        end
+        dir = parent
+      end
+
+      return nil
+    end
+
+    -- Find local executable and return both command and project root
     local function find_local_executable(cmd_name, filepath)
-      -- Get project root by looking for package.json
-      local root = vim.fs.dirname(vim.fs.find({ 'package.json' }, {
-        upward = true,
-        path = filepath,
-      })[1])
+      local root = find_project_root(filepath)
 
       if root then
         -- Try local node_modules/.bin/cmd
         local local_cmd = root .. '/node_modules/.bin/' .. cmd_name
         if vim.fn.executable(local_cmd) == 1 then
-          return local_cmd
+          return local_cmd, root
         end
       end
 
       -- Try npx (will use local if available)
       if vim.fn.executable('npx') == 1 then
-        return 'npx'
+        return 'npx', root
       end
 
       -- Fall back to global command
       if vim.fn.executable(cmd_name) == 1 then
-        return cmd_name
+        return cmd_name, root
       end
 
-      return nil
+      return nil, nil
     end
 
     -- ========================================================================
@@ -102,8 +124,8 @@ return {
         return
       end
 
-      -- Find XO command (local first)
-      local xo_cmd = find_local_executable('xo', filepath)
+      -- Find XO command (local first) and project root
+      local xo_cmd, project_root = find_local_executable('xo', filepath)
       if not xo_cmd then
         return
       end
@@ -119,10 +141,13 @@ return {
       -- Clear previous diagnostics
       vim.diagnostic.reset(xo_ns, bufnr)
 
-      -- Run XO asynchronously
+      -- Run XO asynchronously from project root
       vim.system(
         vim.list_extend({ xo_cmd }, args),
-        { text = true },
+        { 
+          text = true,
+          cwd = project_root  -- Run from project root to find config files
+        },
         vim.schedule_wrap(function(result)
           if not vim.api.nvim_buf_is_valid(bufnr) then
             return
@@ -245,8 +270,8 @@ return {
         return
       end
 
-      -- Find remark command (local first)
-      local remark_cmd = find_local_executable('remark', filepath)
+      -- Find remark command (local first) and project root
+      local remark_cmd, project_root = find_local_executable('remark', filepath)
       if not remark_cmd then
         return
       end
@@ -263,10 +288,13 @@ return {
       -- Clear previous diagnostics
       vim.diagnostic.reset(remark_ns, bufnr)
 
-      -- Run remark asynchronously
+      -- Run remark asynchronously from project root
       vim.system(
         vim.list_extend({ remark_cmd }, args),
-        { text = true },
+        { 
+          text = true,
+          cwd = project_root  -- Run from project root to find config files
+        },
         vim.schedule_wrap(function(result)
           if not vim.api.nvim_buf_is_valid(bufnr) then
             return
@@ -368,8 +396,8 @@ return {
         return
       end
 
-      -- Find pug-lint command (local first)
-      local puglint_cmd = find_local_executable('pug-lint', filepath)
+      -- Find pug-lint command (local first) and project root
+      local puglint_cmd, project_root = find_local_executable('pug-lint', filepath)
       if not puglint_cmd then
         return
       end
@@ -384,10 +412,13 @@ return {
       -- Clear previous diagnostics
       vim.diagnostic.reset(puglint_ns, bufnr)
 
-      -- Run pug-lint asynchronously
+      -- Run pug-lint asynchronously from project root
       vim.system(
         vim.list_extend({ puglint_cmd }, args),
-        { text = true },
+        { 
+          text = true,
+          cwd = project_root  -- Run from project root to find config files
+        },
         vim.schedule_wrap(function(result)
           if not vim.api.nvim_buf_is_valid(bufnr) then
             return
@@ -453,8 +484,8 @@ return {
         return
       end
 
-      -- Find stylelint command (local first)
-      local stylelint_cmd = find_local_executable('stylelint', filepath)
+      -- Find stylelint command (local first) and project root
+      local stylelint_cmd, project_root = find_local_executable('stylelint', filepath)
       if not stylelint_cmd then
         return
       end
@@ -470,10 +501,13 @@ return {
       -- Clear previous diagnostics
       vim.diagnostic.reset(stylelint_ns, bufnr)
 
-      -- Run stylelint asynchronously
+      -- Run stylelint asynchronously from project root
       vim.system(
         vim.list_extend({ stylelint_cmd }, args),
-        { text = true },
+        { 
+          text = true,
+          cwd = project_root  -- Run from project root to find config files
+        },
         vim.schedule_wrap(function(result)
           if not vim.api.nvim_buf_is_valid(bufnr) then
             return
