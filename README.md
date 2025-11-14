@@ -315,6 +315,7 @@ This project includes comprehensive documentation. Here are the key files:
 - **[NERD_FONTS.md](NERD_FONTS.md)**: Guide to installing and configuring Nerd Fonts for icons.
 - **[TERMINAL_SETUP.md](TERMINAL_SETUP.md)**: Instructions for setting up your terminal.
 - **[TERMINAL_URL_UNDERLINES.md](TERMINAL_URL_UNDERLINES.md)**: How to disable URL underlines in your terminal emulator.
+- **[LINTER_CONFIG_FILES.md](LINTER_CONFIG_FILES.md)**: Comprehensive guide to linter configuration file patterns for XO, Remark, Pug-lint, and Stylelint.
 - **[IR_BLACK_THEME.md](IR_BLACK_THEME.md)**: Documentation for the IR Black color scheme.
 - **[MIGRATION.md](MIGRATION.md)**: Our story of migrating from Vim to Neovim.
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**: Guidelines for contributing to this project.

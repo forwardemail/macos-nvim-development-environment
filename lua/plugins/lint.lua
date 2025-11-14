@@ -1,8 +1,10 @@
 --[[
-  Linting Configuration - Local node_modules Support
+  Linting Configuration - Local node_modules Support + Config Detection
 
   All linters prefer local node_modules/.bin installations first,
   then fall back to npx, then global commands.
+
+  Linters only run if a configuration file is found in the project.
 ]]
 
 return {
@@ -10,6 +12,7 @@ return {
   event = { 'BufReadPre', 'BufNewFile' },
   config = function()
     local lint = require('lint')
+    local config_detect = require('utils.linter-config-detection')
 
     -- ========================================================================
     -- HELPER: Find local executable in node_modules or use npx/global
@@ -47,7 +50,7 @@ return {
     -- CONFIGURE STANDARD LINTERS
     -- ========================================================================
 
-    -- Set linters by filetype (non-JS/TS files)
+    -- Set linters by filetype (non-JS/TS/CSS files)
     lint.linters_by_ft = {
       python = { 'pylint' },
       yaml = { 'yamllint' },
@@ -91,6 +94,11 @@ return {
 
       -- Skip if file doesn't exist on disk
       if filepath == '' or vim.fn.filereadable(filepath) == 0 then
+        return
+      end
+
+      -- Check if XO config exists
+      if not config_detect.has_config('xo', filepath) then
         return
       end
 
@@ -232,6 +240,11 @@ return {
         return
       end
 
+      -- Check if Remark config exists
+      if not config_detect.has_config('remark', filepath) then
+        return
+      end
+
       -- Find remark command (local first)
       local remark_cmd = find_local_executable('remark', filepath)
       if not remark_cmd then
@@ -350,6 +363,11 @@ return {
         return
       end
 
+      -- Check if Pug-lint config exists
+      if not config_detect.has_config('puglint', filepath) then
+        return
+      end
+
       -- Find pug-lint command (local first)
       local puglint_cmd = find_local_executable('pug-lint', filepath)
       if not puglint_cmd then
@@ -408,5 +426,118 @@ return {
         end
       end,
     })
+
+    -- ========================================================================
+    -- STYLELINT - Custom Implementation for CSS/SCSS/LESS
+    -- ========================================================================
+
+    local stylelint_ns = vim.api.nvim_create_namespace('stylelint_linter')
+
+    local function run_stylelint()
+      local bufnr = vim.api.nvim_get_current_buf()
+      local filepath = vim.api.nvim_buf_get_name(bufnr)
+
+      -- Only run on CSS/SCSS/LESS files
+      local ft = vim.bo[bufnr].filetype
+      if not vim.tbl_contains({'css', 'scss', 'less', 'sass'}, ft) then
+        return
+      end
+
+      -- Skip if file doesn't exist on disk
+      if filepath == '' or vim.fn.filereadable(filepath) == 0 then
+        return
+      end
+
+      -- Check if Stylelint config exists
+      if not config_detect.has_config('stylelint', filepath) then
+        return
+      end
+
+      -- Find stylelint command (local first)
+      local stylelint_cmd = find_local_executable('stylelint', filepath)
+      if not stylelint_cmd then
+        return
+      end
+
+      -- Build command args
+      local args = {}
+      if stylelint_cmd == 'npx' then
+        table.insert(args, 'stylelint')
+      end
+      table.insert(args, filepath)
+      table.insert(args, '--formatter=json')
+
+      -- Clear previous diagnostics
+      vim.diagnostic.reset(stylelint_ns, bufnr)
+
+      -- Run stylelint asynchronously
+      vim.system(
+        vim.list_extend({ stylelint_cmd }, args),
+        { text = true },
+        vim.schedule_wrap(function(result)
+          if not vim.api.nvim_buf_is_valid(bufnr) then
+            return
+          end
+
+          local output = result.stdout or ''
+          if output == '' then
+            return
+          end
+
+          -- Parse JSON output
+          local ok, decoded = pcall(vim.json.decode, output)
+          if not ok then
+            return
+          end
+
+          -- Convert to diagnostics
+          local diagnostics = {}
+          for _, file_result in ipairs(decoded) do
+            for _, warning in ipairs(file_result.warnings or {}) do
+              table.insert(diagnostics, {
+                bufnr = bufnr,
+                lnum = (warning.line or 1) - 1,
+                col = (warning.column or 1) - 1,
+                end_lnum = (warning.endLine or warning.line or 1) - 1,
+                end_col = (warning.endColumn or warning.column or 1) - 1,
+                severity = warning.severity == 'error' and vim.diagnostic.severity.ERROR or vim.diagnostic.severity.WARN,
+                message = warning.text,
+                source = 'stylelint',
+                code = warning.rule,
+              })
+            end
+          end
+
+          -- Set diagnostics
+          vim.diagnostic.set(stylelint_ns, bufnr, diagnostics, {})
+        end)
+      )
+    end
+
+    -- Run stylelint on save and buffer enter
+    local stylelint_augroup = vim.api.nvim_create_augroup('StylelintLint', { clear = true })
+    vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufEnter' }, {
+      group = stylelint_augroup,
+      pattern = { '*.css', '*.scss', '*.less', '*.sass' },
+      callback = run_stylelint,
+    })
+
+    -- Also run on InsertLeave for faster feedback
+    vim.api.nvim_create_autocmd('InsertLeave', {
+      group = stylelint_augroup,
+      pattern = { '*.css', '*.scss', '*.less', '*.sass' },
+      callback = function()
+        if vim.bo.modified then
+          run_stylelint()
+        end
+      end,
+    })
+
+    -- ========================================================================
+    -- POSTCSS (using stylelint as PostCSS linter is typically done via plugins)
+    -- Note: PostCSS itself is not a linter, but postcss-cli can be used
+    -- with plugins. For now, we'll skip direct PostCSS linting as it's
+    -- typically handled by Stylelint with postcss-syntax.
+    -- ========================================================================
   end,
 }
