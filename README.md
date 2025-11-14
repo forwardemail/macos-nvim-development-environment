@@ -314,6 +314,7 @@ This project includes comprehensive documentation. Here are the key files:
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)**: Solutions to common problems.
 - **[NERD_FONTS.md](NERD_FONTS.md)**: Guide to installing and configuring Nerd Fonts for icons.
 - **[TERMINAL_SETUP.md](TERMINAL_SETUP.md)**: Instructions for setting up your terminal.
+- **[TERMINAL_URL_UNDERLINES.md](TERMINAL_URL_UNDERLINES.md)**: How to disable URL underlines in your terminal emulator.
 - **[IR_BLACK_THEME.md](IR_BLACK_THEME.md)**: Documentation for the IR Black color scheme.
 - **[MIGRATION.md](MIGRATION.md)**: Our story of migrating from Vim to Neovim.
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**: Guidelines for contributing to this project.

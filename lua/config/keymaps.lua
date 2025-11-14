@@ -116,12 +116,23 @@ keymap('n', '<leader>sa', 'zg', { desc = 'Add to dictionary' })
 keymap('n', '<leader>s?', 'z=', { desc = 'Suggest corrections' })
 
 -- ============================================================================
--- LINE SWAPPING (Custom functions loaded from utils)
+-- LINE SWAPPING
 -- ============================================================================
 
--- These will be set up after loading the swap-lines utility
--- Ctrl-j/k for swapping lines (custom function)
--- Ctrl-Up/Down for bubbling lines (vim-unimpaired)
+-- Load swap-lines utility
+local swap_lines = require('utils.swap-lines')
+
+-- Ctrl-j/k for swapping lines up/down (normal mode)
+keymap('n', '<C-j>', swap_lines.swap_up, { silent = true, desc = 'Move line up' })
+keymap('n', '<C-k>', swap_lines.swap_down, { silent = true, desc = 'Move line down' })
+
+-- Ctrl-Up/Down for moving lines (normal mode)
+keymap('n', '<C-Up>', ':move .-2<CR>==', { silent = true, desc = 'Move line up' })
+keymap('n', '<C-Down>', ':move .+1<CR>==', { silent = true, desc = 'Move line down' })
+
+-- Ctrl-Up/Down for moving visual selection (visual mode)
+keymap('v', '<C-Up>', ":move '<-2<CR>gv=gv", { silent = true, desc = 'Move selection up' })
+keymap('v', '<C-Down>', ":move '>+1<CR>gv=gv", { silent = true, desc = 'Move selection down' })
 
 -- ============================================================================
 -- PLUGIN-SPECIFIC KEYMAPS

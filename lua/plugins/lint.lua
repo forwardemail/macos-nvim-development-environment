@@ -83,6 +83,12 @@ return {
         return
       end
 
+      -- Check file extension (XO supports .js, .cjs, .mjs, .jsx, .ts, .cts, .mts, .tsx)
+      local ext = vim.fn.fnamemodify(filepath, ':e')
+      if not vim.tbl_contains({'js', 'cjs', 'mjs', 'jsx', 'ts', 'cts', 'mts', 'tsx'}, ext) then
+        return
+      end
+
       -- Skip if file doesn't exist on disk
       if filepath == '' or vim.fn.filereadable(filepath) == 0 then
         return
@@ -153,14 +159,14 @@ return {
     local xo_augroup = vim.api.nvim_create_augroup('XOLint', { clear = true })
     vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufEnter' }, {
       group = xo_augroup,
-      pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+      pattern = { '*.js', '*.cjs', '*.mjs', '*.jsx', '*.ts', '*.cts', '*.mts', '*.tsx' },
       callback = run_xo,
     })
 
     -- Also run on InsertLeave for faster feedback
     vim.api.nvim_create_autocmd('InsertLeave', {
       group = xo_augroup,
-      pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+      pattern = { '*.js', '*.cjs', '*.mjs', '*.jsx', '*.ts', '*.cts', '*.mts', '*.tsx' },
       callback = function()
         -- Debounce: only run if buffer was modified
         if vim.bo.modified then
@@ -272,14 +278,14 @@ return {
     local remark_augroup = vim.api.nvim_create_augroup('RemarkLint', { clear = true })
     vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufEnter' }, {
       group = remark_augroup,
-      pattern = { '*.md', '*.markdown' },
+      pattern = { '*.md', '*.markdown', '*.mdown', '*.mkdn', '*.mkd', '*.mdwn', '*.mdtxt', '*.mdtext', '*.mdx' },
       callback = run_remark,
     })
 
     -- Also run on InsertLeave for faster feedback
     vim.api.nvim_create_autocmd('InsertLeave', {
       group = remark_augroup,
-      pattern = { '*.md', '*.markdown' },
+      pattern = { '*.md', '*.markdown', '*.mdown', '*.mkdn', '*.mkd', '*.mdwn', '*.mdtxt', '*.mdtext', '*.mdx' },
       callback = function()
         if vim.bo.modified then
           run_remark()
