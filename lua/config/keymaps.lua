@@ -173,6 +173,24 @@ vim.api.nvim_create_user_command('Autoformat', function()
 end, { desc = 'Format buffer with conform.nvim' })
 
 -- ============================================================================
+-- DIAGNOSTICS
+-- ============================================================================
+
+-- Open diagnostic list (Trouble.nvim)
+keymap('n', '<leader>e', ':Trouble diagnostics toggle filter.buf=0<CR>', { desc = 'Open diagnostic list' })
+
+-- Navigate diagnostics
+keymap('n', '[d', vim.diagnostic.goto_prev, { desc = 'Previous diagnostic' })
+keymap('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic' })
+
+-- Classic Vim location list commands (for backward compatibility)
+-- These work with native Neovim location list
+keymap('n', '<leader>lo', ':lopen<CR>', { desc = 'Open location list' })
+keymap('n', '<leader>lc', ':lclose<CR>', { desc = 'Close location list' })
+keymap('n', '<leader>ln', ':lnext<CR>', { desc = 'Next location list item' })
+keymap('n', '<leader>lp', ':lprev<CR>', { desc = 'Previous location list item' })
+
+-- ============================================================================
 -- LSP KEYMAPS (will be set in LSP config)
 -- ============================================================================
 

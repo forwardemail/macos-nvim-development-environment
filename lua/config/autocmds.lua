@@ -134,6 +134,31 @@ end
 -- This is configured in plugins/conform.lua
 
 -- ============================================================================
+-- DIAGNOSTICS
+-- ============================================================================
+
+-- Auto-jump to first diagnostic error on save and populate location list
+local diagnostic_group = augroup('DiagnosticJump', { clear = true })
+autocmd('BufWritePost', {
+  group = diagnostic_group,
+  pattern = '*',
+  callback = function()
+    -- Wait a bit for diagnostics to update after save
+    vim.defer_fn(function()
+      local diagnostics = vim.diagnostic.get(0, { severity = { min = vim.diagnostic.severity.WARN } })
+      if #diagnostics > 0 then
+        -- Populate location list with diagnostics (for :lnext, :lprev, :lopen)
+        vim.diagnostic.setloclist({ open = false })
+        
+        -- Jump to first diagnostic (error or warning)
+        vim.diagnostic.goto_next({ wrap = false, float = false })
+      end
+    end, 100)
+  end,
+  desc = 'Jump to first diagnostic and populate location list on save',
+})
+
+-- ============================================================================
 -- TERMINAL MODE
 -- ============================================================================
 
