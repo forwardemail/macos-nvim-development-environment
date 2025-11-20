@@ -7,6 +7,16 @@ local autocmd = vim.api.nvim_create_autocmd
 local augroup = vim.api.nvim_create_augroup
 
 -- ============================================================================
+-- Enable line wrapping specifically for Markdown files
+-- ============================================================================
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "markdown" },
+  callback = function()
+    vim.opt_local.wrap = true
+  end,
+})
+
+-- ============================================================================
 -- AUTO SAVE
 -- ============================================================================
 

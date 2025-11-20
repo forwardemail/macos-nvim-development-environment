@@ -17,6 +17,7 @@ return {
         model = "qwen2.5-coder:7b-instruct-q4_K_M",
         timeout = 30000,
         api_key_name = "cmd:echo ''",
+        disable_tools = true,  -- Disable all tools including web_search
         extra_request_body = {
           temperature = 0,
           max_tokens = 8192,

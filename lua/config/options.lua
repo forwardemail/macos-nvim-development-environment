@@ -62,7 +62,7 @@ opt.autoindent = true -- Auto indent
 opt.smartindent = true -- Smart indent
 
 -- Wrapping
-opt.wrap = true -- Wrap lines that exceed window width
+opt.wrap = false -- Wrap lines that exceed window width
 opt.linebreak = true -- Break at word boundaries (don't break words)
 opt.breakindent = true -- Preserve indentation in wrapped lines
 
