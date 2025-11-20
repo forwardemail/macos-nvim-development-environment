@@ -137,26 +137,49 @@ end
 -- DIAGNOSTICS
 -- ============================================================================
 
--- Auto-jump to first diagnostic error on save and populate location list
+-- Helper function to populate location list with diagnostics
+local function populate_loclist()
+  vim.diagnostic.setloclist({ open = false })
+end
+
+-- Auto-populate location list and jump to first diagnostic on save
 local diagnostic_group = augroup('DiagnosticJump', { clear = true })
+
+-- Populate location list on save
 autocmd('BufWritePost', {
   group = diagnostic_group,
   pattern = '*',
   callback = function()
     -- Wait a bit for diagnostics to update after save
     vim.defer_fn(function()
+      -- Always populate location list (even if empty)
+      populate_loclist()
+      
+      -- Jump to first diagnostic if any exist
       local diagnostics = vim.diagnostic.get(0, { severity = { min = vim.diagnostic.severity.WARN } })
       if #diagnostics > 0 then
-        -- Populate location list with diagnostics (for :lnext, :lprev, :lopen)
-        vim.diagnostic.setloclist({ open = false })
-        
-        -- Jump to first diagnostic (error or warning)
         vim.diagnostic.goto_next({ wrap = false, float = false })
       end
     end, 100)
   end,
-  desc = 'Jump to first diagnostic and populate location list on save',
+  desc = 'Populate location list and jump to first diagnostic on save',
 })
+
+-- Also populate location list when diagnostics change
+autocmd('DiagnosticChanged', {
+  group = diagnostic_group,
+  pattern = '*',
+  callback = function()
+    populate_loclist()
+  end,
+  desc = 'Update location list when diagnostics change',
+})
+
+-- Create manual command to populate location list on demand
+vim.api.nvim_create_user_command('DiagnosticsToLocList', function()
+  populate_loclist()
+  print('Location list populated with diagnostics')
+end, { desc = 'Populate location list with current diagnostics' })
 
 -- ============================================================================
 -- TERMINAL MODE

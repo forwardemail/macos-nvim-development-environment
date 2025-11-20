@@ -189,6 +189,7 @@ keymap('n', '<leader>lo', ':lopen<CR>', { desc = 'Open location list' })
 keymap('n', '<leader>lc', ':lclose<CR>', { desc = 'Close location list' })
 keymap('n', '<leader>ln', ':lnext<CR>', { desc = 'Next location list item' })
 keymap('n', '<leader>lp', ':lprev<CR>', { desc = 'Previous location list item' })
+keymap('n', '<leader>ll', ':DiagnosticsToLocList<CR>', { desc = 'Populate location list with diagnostics' })
 
 -- ============================================================================
 -- LSP KEYMAPS (will be set in LSP config)
