@@ -3,8 +3,16 @@
 
   Replaces vim-easymotion with modern, faster alternative
   Keybinding: s for 2-char search (same as original)
+  
+  NOTE: Search mode integration is DISABLED to preserve native Vim search behavior.
+  This prevents flash.nvim from intercepting / and ? searches.
 ]]
+return {
+  'folke/flash.nvim',
+  enabled = false,  -- Completely disable the plugin
+}
 
+--[[
 return {
   'folke/flash.nvim',
   event = 'VeryLazy',
@@ -53,7 +61,7 @@ return {
     },
     modes = {
       search = {
-        enabled = true,
+        enabled = false,  -- DISABLED: Prevents flash.nvim from intercepting / and ? search
       },
       char = {
         enabled = true,
@@ -145,3 +153,4 @@ return {
     },
   },
 }
+]]

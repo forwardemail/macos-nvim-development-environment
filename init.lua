@@ -43,6 +43,9 @@ require('config.options')
 require('config.keymaps')
 require('config.autocmds')
 
+-- Setup diagnostic auto-open (must be after autocmds)
+require('config.diagnostic_autoopen').setup()
+
 -- Load plugins with lazy.nvim
 require('lazy').setup('plugins', {
   defaults = {

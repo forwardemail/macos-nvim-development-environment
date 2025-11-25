@@ -35,15 +35,22 @@ return {
     },
   },
   opts = {
-    focus = true, -- Focus the trouble window when opened
+    focus = false, -- Don't focus the trouble window when opened
     follow = true, -- Follow the current item
-    auto_close = false, -- Don't auto close when there are no items
+    auto_close = false, -- Don't auto close when clicking away
     auto_refresh = true, -- Auto refresh when diagnostics change
+    auto_preview = false, -- Don't auto-open preview (fixes double Ctrl+w issue)
     modes = {
       diagnostics = {
-        auto_open = false, -- Don't auto open on diagnostic changes
+        auto_open = false, -- Don't auto open on diagnostic changes (we handle this manually)
         auto_jump = false, -- Don't auto jump when opening
       },
+    },
+    win = {
+      type = 'split', -- Open as horizontal split
+      relative = 'editor', -- Relative to editor (not current window) - fixes neo-tree compatibility
+      position = 'bottom', -- At the bottom
+      size = 10, -- Height in lines
     },
   },
 }
